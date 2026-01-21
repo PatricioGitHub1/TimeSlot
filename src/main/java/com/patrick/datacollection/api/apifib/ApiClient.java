@@ -85,7 +85,6 @@ public class ApiClient {
 
         uriBuilder.setParameter(clientIdParamName,clientId);
         String finalURL = uriBuilder.build().toString();
-        System.out.println(finalURL);
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(finalURL))
@@ -126,12 +125,34 @@ public class ApiClient {
             subject.setSubjectId(entry1.getKey());
 
             for (Map.Entry<String, List<GroupClass>> entry2 : classesByGroupBySubject.get(entry1.getKey()).entrySet()) {
-                Group group = new Group();
-                group.setSubjectId(entry1.getKey());
-                group.setGroupId(entry2.getKey());
-                group.setGroupClassList(entry2.getValue());
-                System.out.println(group.getGroupClassList().size());
-                subject.getGroupList().add(group);
+                for (int i = 1; i < 9; i++) {
+                    List<GroupClass> gcList = new ArrayList<>();
+                    int subgroupID = Integer.parseInt(entry2.getKey()) + i;
+                    String strID = String.valueOf(subgroupID);
+
+                    Group group = new Group();
+                    group.setSubjectId(entry1.getKey());
+                    group.setGroupId(entry2.getKey());
+
+                    boolean valid = false;
+                    for (GroupClass gc : entry2.getValue()) {
+                        if (gc.getClassId().equals(gc.getGroupId())) {
+                            gcList.add(gc);
+                        }
+
+                        if (gc.getClassId().equals(strID)) {
+                            valid = true;
+                            gcList.add(gc);
+                        }
+                    }
+
+                    if (valid) {
+                        group.setGroupClassList(gcList);
+                        subject.getGroupList().add(group);
+                    }
+
+                }
+
             }
 
             subjectList.add(subject);
